@@ -18,8 +18,8 @@
 
     <actions>
         <action id="Antigravity.OpenIn" class="com.example.antigravity.OpenInAntigravityAction" text="Open in Antigravity" description="Opens current file in Antigravity">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift alt A"/>
         </action>
     </actions>
