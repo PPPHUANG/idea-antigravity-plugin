@@ -1,4 +1,4 @@
-package com.example.antigravity
+package com.github.ppphuang.idea_antigravity_plugin
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -10,6 +10,8 @@ import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import java.io.File
 import java.util.Locale
+import com.intellij.notification.NotificationAction
+import com.intellij.openapi.options.ShowSettingsUtil
 
 class OpenInAntigravityAction : AnAction() {
 
@@ -18,9 +20,6 @@ class OpenInAntigravityAction : AnAction() {
         
         // Windows default fallback (User specific + Standard)
         private val WIN_DEFAULTS = listOf(
-            "D:\\Program Files (x86)\\Antigravity\\bin\\antigravity.cmd",
-            "C:\\Program Files\\Antigravity\\bin\\antigravity.cmd",
-            "C:\\Program Files (x86)\\Antigravity\\bin\\antigravity.cmd",
             System.getProperty("user.home") + "\\AppData\\Local\\Programs\\Antigravity\\bin\\antigravity.cmd"
         )
 
@@ -42,37 +41,53 @@ class OpenInAntigravityAction : AnAction() {
 
         val filePath = virtualFile.path
         val line = if (editor != null) editor.caretModel.primaryCaret.logicalPosition.line + 1 else 1
-        val gotoArg = "$filePath:$line"
-        
+        val column = if (editor != null) editor.caretModel.primaryCaret.logicalPosition.column + 1 else 1
+
         val antigravityCmd = findAntigravityCmd()
         
         if (antigravityCmd == null) {
-            Notifications.Bus.notify(
-                Notification(
-                    "Antigravity Notification Group",
-                    "Antigravity Not Found",
-                    "Could not find 'antigravity' executable in PATH or standard locations.",
-                    NotificationType.ERROR
-                ),
-                project
+            val notification = Notification(
+                "Antigravity Notification Group",
+                "Antigravity Not Found",
+                "Could not find 'antigravity' executable in PATH or standard locations.",
+                NotificationType.ERROR
             )
+            notification.addAction(NotificationAction.createSimple("Open Settings") {
+                ShowSettingsUtil.getInstance().showSettingsDialog(project, AntigravitySettingsConfigurable::class.java)
+            })
+            Notifications.Bus.notify(notification, project)
             return
         }
         
+        // 2. Check Standard Locations
+        
         try {
-            val processBuilder = ProcessBuilder(antigravityCmd, "--goto", gotoArg)
+            val command = when {
+                System.getProperty("os.name").lowercase().contains("mac") -> {
+                    // Use CLI directly on Mac as well, avoiding URL scheme issues
+                    arrayOf(antigravityCmd, "--goto", "$filePath:$line:$column")
+                }
+                System.getProperty("os.name").lowercase().contains("windows") -> {
+                    arrayOf("cmd", "/c", antigravityCmd, "--goto", "$filePath:$line:$column")
+                }
+                else -> {
+                    arrayOf(antigravityCmd, "--goto", "$filePath:$line:$column")
+                }
+            }
+
+            val processBuilder = ProcessBuilder(*command)
             processBuilder.start()
             
             // Optional success notification (can be noisy, maybe comment out for prod)
-             Notifications.Bus.notify(
-                 Notification(
-                     "Antigravity Notification Group",
-                     "Opening in Antigravity",
-                     "Executing: $antigravityCmd --goto $gotoArg",
-                     NotificationType.INFORMATION
-                 ),
-                 project
-             )
+//             Notifications.Bus.notify(
+//                 Notification(
+//                     "Antigravity Notification Group",
+//                     "Opening in Antigravity",
+//                     "Executing: ${command.joinToString(" ")}",
+//                     NotificationType.INFORMATION
+//                 ),
+//                 project
+//             )
         } catch (ex: Exception) {
             Notifications.Bus.notify(
                 Notification(
@@ -87,6 +102,15 @@ class OpenInAntigravityAction : AnAction() {
     }
     
     private fun findAntigravityCmd(): String? {
+        // 0. Check Configured Path
+        val settingsPath = AntigravitySettingsState.instance.antigravityPath
+        if (settingsPath.isNotBlank()) {
+            val file = File(settingsPath)
+            if (file.exists()) {
+                 return file.absolutePath
+            }
+        }
+
         val binaryName = if (isWindows) "antigravity.cmd" else "antigravity"
         
         // 1. Check PATH
@@ -100,6 +124,20 @@ class OpenInAntigravityAction : AnAction() {
                 return cmdFile.absolutePath
             }
         }
+
+        // 1.5 Try 'where' or 'which' command
+        try {
+            val whereCmd = if (isWindows) "where" else "which"
+            val process = ProcessBuilder(whereCmd, "antigravity").start()
+            val ret = process.waitFor()
+            if (ret == 0) {
+                val output = process.inputStream.bufferedReader().readText().trim().lines().firstOrNull()
+                if (!output.isNullOrBlank()) {
+                     val file = File(output)
+                     if (file.exists()) return file.absolutePath
+                }
+            }
+        } catch (ignored: Exception) {}
         
         // 2. Check Standard Locations
         val defaults = if (isWindows) WIN_DEFAULTS else MAC_DEFAULTS

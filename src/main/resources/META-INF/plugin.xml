@@ -1,10 +1,25 @@
 <idea-plugin>
-    <id>com.example.antigravity</id>
-    <name>Open in Antigravity</name>
-    <vendor email="support@example.com" url="http://www.example.com">Antigravity</vendor>
+    <id>com.github.ppphuang.idea-antigravity-plugin</id>
+    <name>Switch2Antigravity</name>
+    <vendor email="huangpengr@gmail.com" url="https://github.com/ppphuang">ppphuang</vendor>
 
     <description><![CDATA[
-    Opens the current file and line in Antigravity.
+    <p>Seamlessly integrate <b>Antigravity</b> with IntelliJ IDEA.</p>
+    <p>This plugin allows you to open your current file directly in the Antigravity editor, keeping your context by automatically navigating to the cursor position.</p>
+    
+    <h3>Features:</h3>
+    <ul>
+        <li><b>Open in Antigravity</b>: One-click to open the current file in the external editor.</li>
+        <li><b>Precise Navigation</b>: Automatically jumps to the exact line and column of your cursor.</li>
+        <li><b>Smart Detection</b>: Automatically locates the Antigravity executable in PATH or standard install directories.</li>
+        <li><b>Configuration</b>: Supports custom executable paths via Settings.</li>
+    </ul>
+    
+    <h3>Usage:</h3>
+    <ul>
+        <li>Right-click on any file or editor -> "Open in Antigravity".</li>
+        <li>Shortcut: <b>Shift + Alt + A</b>.</li>
+    </ul>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
@@ -14,10 +29,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="Antigravity Notification Group"
                            displayType="BALLOON"/>
+        <applicationService serviceImplementation="com.github.ppphuang.idea_antigravity_plugin.AntigravitySettingsState"/>
+        <applicationConfigurable instance="com.github.ppphuang.idea_antigravity_plugin.AntigravitySettingsConfigurable"
+                                 displayName="Antigravity"/>
     </extensions>
 
     <actions>
-        <action id="Antigravity.OpenIn" class="com.example.antigravity.OpenInAntigravityAction" text="Open in Antigravity" description="Opens current file in Antigravity">
+        <action id="Antigravity.OpenIn" class="com.github.ppphuang.idea_antigravity_plugin.OpenInAntigravityAction" text="Open in Antigravity" description="Opens current file in Antigravity">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift alt A"/>

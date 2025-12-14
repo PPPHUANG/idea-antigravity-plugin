@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.intellij") version "1.17.4"
 }
 
-group = "com.example.antigravity"
-version = "1.0-SNAPSHOT"
+group = "com.github.ppphuang.idea_antigravity_plugin"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("232")
-        untilBuild.set("255.*")
+        untilBuild.set("")
     }
 
     signPlugin {
