@@ -5,6 +5,7 @@ A productivity plugin for IntelliJ IDEA that seamlessly integrates with **Antigr
 ## Features
 
 -   **Open in Antigravity**: Quickly open the current file in the Antigravity editor.
+-   **Open Project in Antigravity**: Quickly open the current Project in the Antigravity editor.
 -   **Precise Navigation**: Automatically jumps to the exact line and column of your cursor.
 -   **Configurable Path**: Support for custom Antigravity executable paths if it's not in the default location.
 -   **Smart Detection**: Automatically detects Antigravity installation in standard locations or system PATH.

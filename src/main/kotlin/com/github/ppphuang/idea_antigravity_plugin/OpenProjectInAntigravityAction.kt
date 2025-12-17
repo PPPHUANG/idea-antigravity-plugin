@@ -2,32 +2,20 @@ package com.github.ppphuang.idea_antigravity_plugin
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
-import java.io.File
-import java.util.Locale
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.options.ShowSettingsUtil
 
-class OpenInAntigravityAction : AnAction() {
+class OpenProjectInAntigravityAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val project: Project? = e.project
-        val virtualFile: VirtualFile? = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        val editor = e.getData(CommonDataKeys.EDITOR)
+        val project: Project = e.project ?: return
 
-        if (project == null || virtualFile == null) {
-            return
-        }
-
-        val filePath = virtualFile.path
-        val line = if (editor != null) editor.caretModel.primaryCaret.logicalPosition.line + 1 else 1
-        val column = if (editor != null) editor.caretModel.primaryCaret.logicalPosition.column + 1 else 1
-
+        val projectPath = project.basePath ?: return
+        
         val antigravityCmd = AntigravityUtils.findAntigravityCmd()
         
         if (antigravityCmd == null) {
@@ -43,31 +31,26 @@ class OpenInAntigravityAction : AnAction() {
             Notifications.Bus.notify(notification, project)
             return
         }
-        
-        // 2. Check Standard Locations
-        
+
         try {
             val command = when {
-                System.getProperty("os.name").lowercase().contains("mac") -> {
-                    // Use CLI directly on Mac as well, avoiding URL scheme issues
-                    arrayOf(antigravityCmd, "--goto", "$filePath:$line:$column")
-                }
                 System.getProperty("os.name").lowercase().contains("windows") -> {
-                    arrayOf("cmd", "/c", antigravityCmd, "--goto", "$filePath:$line:$column")
+                    // Windows might need cmd /c
+                   arrayOf("cmd", "/c", antigravityCmd, projectPath)
                 }
                 else -> {
-                    arrayOf(antigravityCmd, "--goto", "$filePath:$line:$column")
+                    arrayOf(antigravityCmd, projectPath)
                 }
             }
 
             val processBuilder = ProcessBuilder(*command)
             processBuilder.start()
-            
+
         } catch (ex: Exception) {
             Notifications.Bus.notify(
                 Notification(
                     "Antigravity Notification Group",
-                    "Failed to Open Antigravity",
+                    "Failed to Open Project in Antigravity",
                     "Error: ${ex.message}",
                     NotificationType.ERROR
                 ),
@@ -77,6 +60,7 @@ class OpenInAntigravityAction : AnAction() {
     }
 
     override fun update(e: AnActionEvent) {
-        e.presentation.isEnabledAndVisible = e.project != null && e.getData(CommonDataKeys.VIRTUAL_FILE) != null
+        // Only enable if there is a project open
+        e.presentation.isEnabledAndVisible = e.project != null && e.project?.basePath != null
     }
 }
