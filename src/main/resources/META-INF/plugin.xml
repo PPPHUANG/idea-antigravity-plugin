@@ -18,7 +18,7 @@
     <h3>Usage:</h3>
     <ul>
         <li>Right-click on any file or editor -> "Open in Antigravity".</li>
-        <li>Right-click on project view -> "Open Project in Antigravity".</li>
+        <li>Right-click on project view -> "Open in Antigravity".</li>
         <li>Shortcut: <b>Shift + Alt + A</b>.</li>
     </ul>
     ]]></description>
@@ -38,14 +38,14 @@
     <actions>
         <action id="Antigravity.OpenIn" class="com.github.ppphuang.idea_antigravity_plugin.OpenInAntigravityAction" text="Open in Antigravity" description="Opens current file in Antigravity">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="EditSource"/>
-            <add-to-group group-id="NavbarPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first" relative-to-action="EditSource"/>
+            <add-to-group group-id="NavbarPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift alt A"/>
         </action>
-        <action id="Antigravity.OpenProject" class="com.github.ppphuang.idea_antigravity_plugin.OpenProjectInAntigravityAction" text="Open Project in Antigravity" description="Opens current project in Antigravity">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="Antigravity.OpenIn"/>
-            <add-to-group group-id="NavbarPopupMenu" anchor="after" relative-to-action="Antigravity.OpenIn"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
+<!--        <action id="Antigravity.OpenProject" class="com.github.ppphuang.idea_antigravity_plugin.OpenProjectInAntigravityAction" text="Open Project in Antigravity" description="Opens current project in Antigravity">-->
+<!--            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="Antigravity.OpenIn"/>-->
+<!--            <add-to-group group-id="NavbarPopupMenu" anchor="after" relative-to-action="Antigravity.OpenIn"/>-->
+<!--            <add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+<!--        </action>-->
     </actions>
 </idea-plugin>

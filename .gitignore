@@ -1,6 +1,7 @@
 
 ### IntelliJ Plugin Build Artifacts
 build/
+bin/
 out/
 .gradle/
 gradle/

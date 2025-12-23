@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.ppphuang.idea_antigravity_plugin"
-version = "1.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
