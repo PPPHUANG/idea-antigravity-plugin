@@ -63,4 +63,8 @@ class OpenProjectInAntigravityAction : AnAction() {
         // Only enable if there is a project open
         e.presentation.isEnabledAndVisible = e.project != null && e.project?.basePath != null
     }
+
+    override fun getActionUpdateThread(): com.intellij.openapi.actionSystem.ActionUpdateThread {
+        return com.intellij.openapi.actionSystem.ActionUpdateThread.BGT
+    }
 }
